@@ -37,7 +37,11 @@ app.use((req, res, next) => {
 });
 app.set('veiw engine', 'ejs')
 
-
+app.get("/",(req,res)=>{
+  res.status(200).json({
+    message :"Hello Alter office"
+  })
+})
 app.use("/api/shorten", shortenUrlRoutes);
 app.use("/api/analytics", shortenUrlAnalyticsRoutes);
 app.get("/:alias", redirectShortenUrl);
