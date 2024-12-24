@@ -25,5 +25,6 @@ jobs:
       - name: Delete old container
         run: docker rm -f the-alter-office-backend-container
       - name: Run Docker Container
-        run: docker run -d -p 3000:3000 -name dollu/the-alter-office-backend-container the-alter-office-backend
+        run: docker run -d -p 3000:3000 --name dollu/the-alter-office-backend-container the-alter-office-backend
+
         
