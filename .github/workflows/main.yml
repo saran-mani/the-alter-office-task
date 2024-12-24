@@ -12,8 +12,12 @@ jobs:
         uses: actions/checkout@v3
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build Docker image
-        run: docker build -t dollu/the-alter-office-backend .
+      - name: Check if image exists in Docker Hub
+        run: |
+          if ! docker pull dollu/the-alter-office-backend:latest; then
+            echo "Image not found, building new image"
+            docker build -t dollu/the-alter-office-backend .
+          fi
       - name: Publish image to Docker Hub
         run: docker push dollu/the-alter-office-backend:latest
 
@@ -23,22 +27,22 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Pull Docker image from Docker Hub
-        run: docker pull dollu/the-alter-office-backend:latest
+      - name: Create a custom network
+        run: docker network create my-network || true
       - name: Start Redis container
         run: |
-          docker run -d --name redis-server -p 6379:6379 redis:latest
-      - name: Delete old container
+          docker run -d --name redis-server --network my-network -p 6379:6379 redis:latest
+      - name: Delete old backend container if it exists
         run: docker rm -f the-alter-office-backend-container || true
-      - name: Run Docker container with secrets as environment variables
+      - name: Run backend container with secrets as environment variables
         run: |
           docker run -d -p 3000:3000 --name the-alter-office-backend-container \
-            --link redis-server:redis \
+            --network my-network \
             -e MONGO_URI=${{ secrets.MONGO_URI }} \
             -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
             -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e SESSION_SECRET=${{ secrets.SESSION_SECRET }} \
-            -e REDIS_HOST=redis \
+            -e REDIS_HOST=redis-server \
             -e REDIS_PORT=6379 \
             dollu/the-alter-office-backend
