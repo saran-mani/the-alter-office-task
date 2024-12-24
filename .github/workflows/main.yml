@@ -1,0 +1,29 @@
+name: CICD
+
+on:
+  push:
+     branches: [main]
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: login to docker hub
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build Docker image
+        run: docker build -t the-alter-office-backend .
+      - name: Publish image to docker hub
+        run: docker push the-alter-office-backend:latest
+
+  deploy:
+    needs: build
+    runs-on: [azure-vm]
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull the-alter-office-backend:latest
+      - name: Delete old container
+        run: docker rm -f the-alter-office-backend-container
+      - name: Run Docker Container
+        run: docker run -d -p 3000:3000 -name the-alter-office-backend-container the-alter-office-backend
+        
