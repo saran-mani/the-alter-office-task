@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 
 const redisClient = new Redis({
-  host: '172.17.0.2',
+  host: '127.0.0.1',
   port: 6379,
   maxRetriesPerRequest: null,
 });
