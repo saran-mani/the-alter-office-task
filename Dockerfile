@@ -1,8 +1,20 @@
 FROM node:20.18.0
+
+# Set working directory
 WORKDIR /src
+
+# Copy package.json and install dependencies first for caching
 COPY package.json ./
-COPY . .
 RUN npm install
+
+# Copy the rest of the application files
+COPY . .
+
+# Install PM2 globally
 RUN npm install -g pm2
+
+# Expose the port
 EXPOSE 3000
-CMD ["pm2","start","src/app.js"]
+
+# Start the application with PM2
+CMD ["pm2-runtime", "src/app.js"]
