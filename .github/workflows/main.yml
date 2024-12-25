@@ -30,6 +30,7 @@ jobs:
     runs-on: self-hosted  # Assuming the Azure VM is a self-hosted runner
     steps:
       - name: Pull and Start Containers
+        working-directory: ./
         run: |
           docker-compose down
           docker-compose pull
