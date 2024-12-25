@@ -34,3 +34,13 @@ jobs:
           docker-compose down
           docker-compose pull
           docker-compose up -d
+      - name: Run Containers with Environment Variables (if needed)
+        run: |
+          docker-compose down  # Ensure all containers are stopped before restarting
+          docker-compose up -d \
+            --build \
+            -e MONGO_URI="${{ secrets.MONGO_URI }}" \
+            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e SESSION_SECRET="${{ secrets.SESSION_SECRET }}"
