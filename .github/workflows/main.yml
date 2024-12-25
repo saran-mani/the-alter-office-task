@@ -22,19 +22,12 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted  # Assuming Azure VM is a self-hosted runner
+    runs-on: self-hosted 
     steps:
       - name: Stop and Remove Old Containers
         run: |
           docker stop the-alter-office-backend-container || true
           docker rm the-alter-office-backend-container || true
-          docker stop redis-server || true
-          docker rm redis-server || true
-
-      - name: Run Redis Container
-        run: |
-          docker run -d --name redis-server -p 6379:6379 redis
-
       - name: Pull Latest Backend Image
         run: |
           docker pull dollu/the-alter-office-backend:latest
@@ -47,6 +40,4 @@ jobs:
             -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e SESSION_SECRET=${{ secrets.SESSION_SECRET }} \
-            -e REDIS_HOST=redis-server \
-            -e REDIS_PORT=6379 \
             dollu/the-alter-office-backend
