@@ -12,36 +12,41 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
       - name: Login to Docker Hub
         run: docker login -u "${{ secrets.DOCKER_USERNAME }}" --password "${{ secrets.DOCKER_PASSWORD }}"
 
       - name: Build and Push Docker Images
         run: |
-          docker-compose build
-          docker-compose push
+          docker build -t dollu/the-alter-office-backend .
+          docker push dollu/the-alter-office-backend:latest
 
   deploy:
     needs: build
-    runs-on: self-hosted  # Assuming the Azure VM is a self-hosted runner
+    runs-on: self-hosted  # Assuming Azure VM is a self-hosted runner
     steps:
-      - name: Pull and Start Containers
-        working-directory: ./
+      - name: Stop and Remove Old Containers
         run: |
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
-      - name: Run Containers with Environment Variables (if needed)
+          docker stop the-alter-office-backend-container || true
+          docker rm the-alter-office-backend-container || true
+          docker stop redis-server || true
+          docker rm redis-server || true
+
+      - name: Run Redis Container
         run: |
-          docker-compose down  # Ensure all containers are stopped before restarting
-          docker-compose up -d \
-            --build \
-            -e MONGO_URI="${{ secrets.MONGO_URI }}" \
-            -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
-            -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
-            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-            -e SESSION_SECRET="${{ secrets.SESSION_SECRET }}"
+          docker run -d --name redis-server -p 6379:6379 redis
+
+      - name: Pull Latest Backend Image
+        run: |
+          docker pull dollu/the-alter-office-backend:latest
+
+      - name: Run Backend Container
+        run: |
+          docker run -d -p 3000:3000 --name the-alter-office-backend-container \
+            -e MONGO_URI=${{ secrets.MONGO_URI }} \
+            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+            -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e SESSION_SECRET=${{ secrets.SESSION_SECRET }} \
+            -e REDIS_HOST=redis-server \
+            -e REDIS_PORT=6379 \
+            dollu/the-alter-office-backend
