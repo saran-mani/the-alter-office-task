@@ -26,7 +26,7 @@ app.use(morgan("dev"));
 
 app.use(
   cors({
-    origin: ["http://20.244.32.214:3000"],
+    origin: ["http://localhost:5173","https://the-alter-office-frontend.netlify.app/"],
     methods: ["GET", "POST", "OPTIONS"],
   })
 );
