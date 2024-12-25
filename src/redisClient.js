@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 
 const redisClient = new Redis({
-  host: '127.0.0.1',
+  host: 'host.docker.internal',
   port: 6379,
   maxRetriesPerRequest: null,
 });
