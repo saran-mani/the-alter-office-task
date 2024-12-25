@@ -12,6 +12,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Login to Docker Hub
         run: docker login -u "${{ secrets.DOCKER_USERNAME }}" --password "${{ secrets.DOCKER_PASSWORD }}"
 
@@ -22,7 +27,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted  # Assuming Azure VM is a self-hosted runner
+    runs-on: self-hosted  # Assuming the Azure VM is a self-hosted runner
     steps:
       - name: Pull and Start Containers
         run: |
