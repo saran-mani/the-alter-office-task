@@ -17,4 +17,4 @@ RUN npm install -g pm2
 EXPOSE 3000
 
 # Start the application with PM2
-CMD ["pm2","restart","src/app.js"]
+CMD ["pm2-runtime", "src/app.js"]
