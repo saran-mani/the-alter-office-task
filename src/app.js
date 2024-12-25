@@ -24,7 +24,12 @@ mongoose
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://20.244.32.214:3000"],
+    methods: ["GET", "POST", "OPTIONS"],
+  })
+);
 
 app.use(helmet());
 
@@ -46,7 +51,6 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/shorten", urlShortnerRoutes);
 app.use("/api/analytics", analyticsRoutes);
-
 
 app.use(errorController);
 
