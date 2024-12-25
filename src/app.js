@@ -24,13 +24,12 @@ mongoose
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173","https://the-alter-office-frontend.netlify.app/"],
-    methods: ["GET", "POST", "OPTIONS"],
-  })
-);
+const corsOptions = {
+  origin: 'https://the-alter-office-frontend.netlify.app',
+  methods: 'GET,POST,PUT,DELETE'
+};
 
+app.use(cors(corsOptions));  // Enable CORS with the specified options
 app.use(helmet());
 
 app.set("trust proxy", true);
