@@ -27,11 +27,6 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Create a custom network
-        run: docker network create my-network || true
-      - name: Start Redis container
-        run: |
-          docker run -d --name redis-server --network my-network -p 6379:6379 redis:latest
       - name: Delete old backend container if it exists
         run: docker rm -f the-alter-office-backend-container || true
       - name: Run backend container with secrets as environment variables
