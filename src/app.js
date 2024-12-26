@@ -10,7 +10,7 @@ import urlShortnerRoutes from "./routes/urlShortenerRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import errorController from "./controllers/errorController.js";
-
+import rateLimit from "express-rate-limit"
 dotenv.config();
 
 const app = express();
@@ -23,13 +23,22 @@ mongoose
 
 app.use(bodyParser.json());
 app.use(morgan("dev"));
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 50, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+// Apply the rate limit to all requests
+app.use(limiter);
 
 const corsOptions = {
   origin: 'https://the-alter-office-frontend.netlify.app',
   methods: 'GET,POST,PUT,DELETE'
 };
 
-app.use(cors(corsOptions));  // Enable CORS with the specified options
+
+app.use(cors(corsOptions));
 app.use(helmet());
 
 app.set("trust proxy", true);

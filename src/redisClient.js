@@ -3,7 +3,7 @@ import Redis from 'ioredis';
 const redisClient = new Redis({
   host: '10.4.0.4',
   port: 6379,
-  maxRetriesPerRequest: null,
+  maxRetriesPerRequest: 3,
 });
 
 redisClient.on('connect', () => {
